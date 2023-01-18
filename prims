@@ -1,1 +1,72 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX_NODES 100
+
+int n; // number of nodes
+int graph[MAX_NODES][MAX_NODES]; // adjacency matrix representation of graph
+int parent[MAX_NODES]; // array to store MST
+int key[MAX_NODES]; // array to store key values of the nodes
+bool mstSet[MAX_NODES]; // array to keep track of included nodes
+
+// function to find the vertex with minimum key value
+int minKey() {
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < n; v++)
+        if (mstSet[v] == false && key[v] < min)
+            min = key[v], min_index = v;
+
+    return min_index;
+}
+
+// function to construct and print MST for a graph represented using adjacency matrix representation
+void primMST() {
+    // initialize all keys as INFINITE
+    for (int i = 0; i < n; i++)
+        key[i] = INT_MAX, mstSet[i] = false;
+
+    // always include first 1st vertex in MST
+    key[0] = 0;
+    parent[0] = -1; // first node is root of MST
+
+    // MST will have n-1 edges
+    for (int count = 0; count < n - 1; count++) {
+        // pick the minimum key vertex from the set of vertices not yet included in MST
+        int u = minKey();
+
+        // add the picked vertex to the MST set
+        mstSet[u] = true;
+
+        // update key value and parent index of the adjacent vertices of the picked vertex
+        for (int v = 0; v < n; v++)
+
+            // graph[u][v] is non zero only for adjacent vertices of m
+            // mstSet[v] is false for vertices not yet included in MST
+            // Update the key only if graph[u][v] is smaller than key[v]
+            if (graph[u][v] && mstSet[v] == false && graph[u][v] < key[v])
+                parent[v] = u, key[v] = graph[u][v];
+    }
+
+    // print the constructed MST
+    printf("Edge \tWeight\n");
+    for (int i = 1; i < n; i++)
+        printf("%d - %d \t%d \n", parent[i], i, graph[i][parent[i]]);
+}
+
+// driver program to test above function
+int main() {
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &graph[i][j]);
+
+    primMST();
+
+    return 0;
+}
