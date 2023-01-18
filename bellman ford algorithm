@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <limits.h>
+
+#define MAX_VERTICES 100
+#define INF INT_MAX
+
+int n; // number of vertices
+int m; // number of edges
+int graph[MAX_VERTICES][MAX_VERTICES]; // adjacency matrix representation of graph
+
+// Bellman-Ford algorithm for a graph represented using adjacency matrix representation
+void BellmanFord(int src)
+{
+    int dist[MAX_VERTICES]; // array to store shortest distance from src to i
+
+    // initialize all distances as INFINITE
+    for (int i = 0; i < n; i++)
+        dist[i] = INF;
+
+    // distance of source vertex from itself is always 0
+    dist[src] = 0;
+
+    // relax all edges |V| - 1 times
+    for (int i = 1; i <= n-1; i++)
+    {
+        for (int u = 0; u < n; u++)
+        {
+            for (int v = 0; v < n; v++)
+            {
+                if (graph[u][v] && dist[u] != INF && dist[u] + graph[u][v] < dist[v])
+                    dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+
+    // check for negative-weight cycles
+    for (int u = 0; u < n; u++)
+    {
+        for (int v = 0; v < n; v++)
+        {
+            if (graph[u][v] && dist[u] != INF && dist[u] + graph[u][v] < dist[v])
+            {
+                printf("Graph contains negative weight cycle\n");
+                return;
+            }
+        }
+    }
+
+    // print the constructed distance array
+    printf("Vertex \t Distance from Source\n");
+    for (int i = 0; i < n; i++)
+        printf("%d \t\t %d\n", i, dist[i]);
+}
+
+int main()
+{
+    printf("Enter the number of vertices and edges: ");
+    scanf("%d %d", &n, &m);
+  
+    // Read the graph edges and weights
+    printf("Enter the edges and weights:\n");
+    int u, v, w;
+    for (int i = 0; i < m; i++)
+    {
+        scanf("%d %d %d", &u, &v, &w);
+        graph[u][v] = w;
+    }
+  
+    int src;
+    printf("Enter the source vertex: ");
+    scanf("%d", &src);
+  
+    BellmanFord(src);
+  
+    return 0;
+}
+/*tp find mst we can use Bellam_ford algorithm fro directed graphs with 
